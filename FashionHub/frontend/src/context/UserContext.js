@@ -1,7 +1,9 @@
-import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axios';
 
-export const UserContext = createContext();
+const UserContext = createContext();
+
+export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -22,11 +24,7 @@ export const UserProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                 },
             };
-            const { data } = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/auth/login`,
-                { email, password },
-                config
-            );
+            const { data } = await api.post('/auth/login', { email, password }, config);
             setUser(data);
             localStorage.setItem('userInfo', JSON.stringify(data));
             return data; // Return user data on successful login

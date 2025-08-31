@@ -1,6 +1,10 @@
+.cart-icon-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .cart-icon {
     position: relative;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
