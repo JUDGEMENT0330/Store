@@ -1,0 +1,33 @@
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.light-theme .app-header {
+    background-color: #fff;
+    border-bottom-color: #eee;
+}
+
+.dark-theme .app-header {
+    background-color: #1a1a1a;
+    border-bottom-color: #333;
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.light-theme .logo a {
+    color: #000;
+}
+
+.dark-theme .logo a {
+    color: #fff;
+}

@@ -1,0 +1,118 @@
+.product-manager {
+    padding: 2rem;
+}
+
+.product-manager h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.product-manager form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.light-theme .product-manager form {
+    background-color: #fff;
+    border-color: #ddd;
+}
+
+.dark-theme .product-manager form {
+    background-color: #333;
+    border-color: #555;
+}
+
+.product-manager form input,
+.product-manager form textarea,
+.product-manager form select {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.light-theme .product-manager form input,
+.light-theme .product-manager form textarea,
+.light-theme .product-manager form select {
+    background-color: #fff;
+    color: #333;
+    border-color: #ccc;
+}
+
+.dark-theme .product-manager form input,
+.dark-theme .product-manager form textarea,
+.dark-theme .product-manager form select {
+    background-color: #555;
+    color: #eee;
+    border-color: #777;
+}
+
+.product-manager form button {
+    padding: 0.8rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.product-manager form button:hover {
+    background-color: #0056b3;
+}
+
+.product-manager table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+}
+
+.product-manager table th,
+.product-manager table td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: left;
+}
+
+.light-theme .product-manager table th,
+.light-theme .product-manager table td {
+    border-color: #ddd;
+}
+
+.dark-theme .product-manager table th,
+.dark-theme .product-manager table td {
+    border-color: #555;
+}
+
+.product-manager table th {
+    background-color: #f2f2f2;
+}
+
+.light-theme .product-manager table th {
+    background-color: #f2f2f2;
+}
+
+.dark-theme .product-manager table th {
+    background-color: #444;
+}
+
+.product-manager table td button {
+    margin-right: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.product-manager table td button:last-child {
+    background-color: #dc3545;
+}
