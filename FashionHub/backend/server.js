@@ -33,7 +33,7 @@ app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/admin/products', require('./routes/admin/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/admin/orders', require('./routes/admin/orderRoutes'));
-// app.use('/api/cart', require('./routes/cartRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/checkout', require('./routes/checkoutRoutes'));
 
 

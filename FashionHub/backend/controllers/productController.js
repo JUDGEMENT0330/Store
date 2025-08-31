@@ -1,4 +1,5 @@
 const Producto = require('../models/Producto');
+const Categoria = require('../models/Categoria');
 
 // @desc    Fetch all products
 // @route   GET /api/products
@@ -7,8 +8,13 @@ const getProducts = async (req, res) => {
     try {
         const filter = {};
         if (req.query.category) {
-            // This assumes category is an ID. A more advanced implementation would handle slugs.
-            filter.categoria = req.query.category;
+            const category = await Categoria.findOne({ slug: req.query.category });
+            if (category) {
+                filter.categoria = category._id;
+            } else {
+                // Handle case where category slug does not exist
+                return res.json([]);
+            }
         }
         const products = await Producto.find(filter).populate('categoria');
         res.json(products);

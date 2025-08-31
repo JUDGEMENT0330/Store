@@ -1,4 +1,5 @@
 const Categoria = require('../models/Categoria');
+const Producto = require('../models/Producto');
 
 // Function to create a slug from a string
 const slugify = (str) => {
@@ -76,17 +77,30 @@ const updateCategory = async (req, res) => {
 // @access  Private/Admin
 const deleteCategory = async (req, res) => {
     try {
-        const categoria = await Categoria.findById(req.params.id);
+        const categoryId = req.params.id;
+
+        // Check for child categories
+        const childCategories = await Categoria.find({ parent: categoryId });
+        if (childCategories.length > 0) {
+            return res.status(400).json({ message: 'Cannot delete category with children. Reassign children first.' });
+        }
+
+        // Check for associated products
+        const products = await Producto.find({ categoria: categoryId });
+        if (products.length > 0) {
+            return res.status(400).json({ message: 'Cannot delete category with associated products. Reassign products first.' });
+        }
+
+        const categoria = await Categoria.findById(categoryId);
 
         if (categoria) {
-            // TODO: Add logic to handle children categories and associated products before deletion
-            await categoria.deleteOne(); // Using deleteOne instead of remove
+            await categoria.deleteOne();
             res.json({ message: 'Category removed' });
         } else {
             res.status(404).json({ message: 'Category not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 

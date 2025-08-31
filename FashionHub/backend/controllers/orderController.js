@@ -1,5 +1,6 @@
 const Pedido = require('../models/Pedido');
 const Usuario = require('../models/Usuario');
+const Producto = require('../models/Producto');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -23,6 +24,13 @@ const createOrder = async (req, res) => {
         });
 
         const createdOrder = await order.save();
+
+        // Update stock
+        for (const item of orderItems) {
+            await Producto.findByIdAndUpdate(item.producto, {
+                $inc: { stock: -item.cantidad }
+            });
+        }
 
         // Add order to user's orders array
         await Usuario.findByIdAndUpdate(req.user._id, { $push: { pedidos: createdOrder._id } });

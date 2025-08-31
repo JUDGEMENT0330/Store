@@ -1,16 +1,21 @@
 import React from 'react';
-// We will later add components to list products
-// import ProductList from '../components/ProductList/ProductList';
+import { useParams } from 'react-router-dom';
+import ProductList from '../components/ProductList/ProductList';
+import CategoryMenu from '../components/CategoryMenu/CategoryMenu';
 
 const ShopPage = () => {
-    // We can get the category slug from the URL params
-    // const { categorySlug } = useParams();
+    const { categorySlug } = useParams();
 
     return (
-        <div>
-            <h1>Shop</h1>
-            <p>Browse our collection of products.</p>
-            {/* <ProductList categorySlug={categorySlug} /> */}
+        <div className="shop-page">
+            <div className="category-menu-container">
+                <CategoryMenu />
+            </div>
+            <div className="product-list-container">
+                <h1>Shop</h1>
+                <p>Browse our collection of products.</p>
+                <ProductList categorySlug={categorySlug} />
+            </div>
         </div>
     );
 };
