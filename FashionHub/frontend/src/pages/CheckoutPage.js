@@ -1,7 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { CartContext } from '../context/CartContext';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
+import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 
 // Stripe Elements
 import { loadStripe } from '@stripe/stripe-js';
@@ -9,13 +10,14 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 
 // Make sure to call loadStripe outside of a component’s render to avoid
 // recreating the Stripe object on every render.
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTgbpR5o'); // Replace with your actual publishable key
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = ({ totalAmount }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
-    const { cartItems, clearCart } = useContext(CartContext);
+    const { cart, removeFromCart, updateCartItemQuantity, cartTotal } = useCart(); // Updated context
+    const { user } = useUser(); // Get user
     const [shippingAddress, setShippingAddress] = useState({
         direccion: '',
         ciudad: '',
@@ -44,7 +46,7 @@ const CheckoutForm = ({ totalAmount }) => {
 
         try {
             // 1. Create Payment Intent on your backend
-            const { data: clientSecretData } = await axios.post(`${process.env.REACT_APP_API_URL}/api/checkout/create-payment-intent`, {
+            const { data: clientSecretData } = await api.post('/checkout/create-payment-intent', {
                 amount: Math.round(totalAmount * 100) // Amount in cents
             });
 
@@ -55,7 +57,7 @@ const CheckoutForm = ({ totalAmount }) => {
                 payment_method: {
                     card: cardElement,
                     billing_details: {
-                        name: 'Customer Name', // Replace with actual customer name from user context
+                        name: user ? user.nombre : 'Guest', // Use user's name
                     },
                 },
             });
@@ -68,13 +70,17 @@ const CheckoutForm = ({ totalAmount }) => {
 
             if (paymentIntent.status === 'succeeded') {
                 // 3. Create Order on your backend
-                await axios.post(`${process.env.REACT_APP_API_URL}/api/orders`, {
-                    orderItems: cartItems.map(item => ({
-                        producto: item._id,
-                        nombre: item.nombre,
-                        cantidad: item.qty,
-                        imagen: item.imagenes[0],
-                        precio: item.precio
+                // Note: The new cart context does not have a `clearCart` method,
+                // as the cart is now managed on the backend. A successful order
+                // should probably clear the cart on the backend as well.
+                // For now, the cart will be fetched again on next load.
+                await api.post('/orders', {
+                    orderItems: cart.map(item => ({
+                        producto: item.producto._id,
+                        nombre: item.producto.nombre,
+                        cantidad: item.cantidad, // Use 'cantidad' from new context
+                        imagen: item.producto.imagenes[0],
+                        precio: item.producto.precio
                     })),
                     shippingAddress: shippingAddress,
                     paymentIntentId: paymentIntent.id,
@@ -82,9 +88,9 @@ const CheckoutForm = ({ totalAmount }) => {
                 });
 
                 setSuccess(true);
-                clearCart(); // Clear cart after successful order
                 setLoading(false);
-                navigate('/my-orders'); // Redirect to user's orders page
+                // Maybe redirect to an order confirmation page
+                navigate('/my-orders'); // Assuming this page exists
             } else {
                 setError('Payment not successful. Please try again.');
                 setLoading(false);
@@ -118,33 +124,33 @@ const CheckoutForm = ({ totalAmount }) => {
 
 
 const CheckoutPage = () => {
-    const { cartItems } = useContext(CartContext);
+    const { cart, cartTotal } = useCart();
     const navigate = useNavigate();
 
-    const subtotal = cartItems.reduce((acc, item) => acc + item.qty * item.precio, 0);
     const shippingCost = 10; // Example shipping cost
-    const totalAmount = subtotal + shippingCost;
+    const totalAmount = cartTotal + shippingCost;
 
     useEffect(() => {
-        if (cartItems.length === 0) {
-            navigate('/cart'); // Redirect if cart is empty
+        // Redirect if cart is empty after initial load
+        if (cart && cart.length === 0) {
+            navigate('/cart');
         }
-    }, [cartItems, navigate]);
+    }, [cart, navigate]);
 
     return (
         <div className="checkout-page">
             <h1>Checkout</h1>
             <div className="order-summary">
                 <h2>Order Summary</h2>
-                {cartItems.map(item => (
-                    <div key={item._id} className="summary-item">
-                        <span>{item.nombre} x {item.qty}</span>
-                        <span>${(item.qty * item.precio).toFixed(2)}</span>
+                {cart.map(item => (
+                    <div key={item.producto._id} className="summary-item">
+                        <span>{item.producto.nombre} x {item.cantidad}</span>
+                        <span>${(item.cantidad * item.producto.precio).toFixed(2)}</span>
                     </div>
                 ))}
                 <div className="summary-total">
                     <span>Subtotal:</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>${cartTotal.toFixed(2)}</span>
                 </div>
                 <div className="summary-total">
                     <span>Shipping:</span>
